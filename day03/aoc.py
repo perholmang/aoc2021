@@ -1,18 +1,32 @@
 from os import environ
 
 
-def most_common_bit(inp, pos):
-    zeros, ones = 0, 0
-    for _, b in enumerate(inp):
-        if b[pos] == "1":
-            ones += 1
-        elif b[pos] == "0":
-            zeros += 1
+def most_common_bit(l, i):
+    count = {"0": 0, "1": 0}
+    for _, b in enumerate(l):
+        count[b[i]] += 1
 
-    if zeros == ones:
+    if count["0"] == count["1"]:
         return -1
 
-    return 0 if zeros > ones else 1
+    return 0 if count["0"] > count["1"] else 1
+
+
+def filter_oxygen_rating(i, mcb, l):
+    return list(filter(lambda n: n[i] == (str(mcb) if mcb > -1 else "1"), l))
+
+
+def filter_co2_scrubber_rating(i, mcb, l):
+    return list(filter(lambda n: n[i] != (str(mcb) if mcb > -1 else "1"), l))
+
+
+def process(numbers, fn):
+    l = numbers
+    for i, _ in enumerate(numbers[0]):
+        mcb = most_common_bit(l, i)
+        l = fn(i, mcb, l)
+        if len(l) == 1:
+            return int(l[0], 2)
 
 
 def part1(numbers):
@@ -25,33 +39,9 @@ def part1(numbers):
     return int(gamma, 2) * int(epsilon, 2)
 
 
-def keep(itm, bit, pos):
-    if itm[pos] == str(bit):
-        return True
-    return False
-
-
-def oxygen_rating(numbers):
-    l = numbers
-    for i, _ in enumerate(numbers[0]):
-        mcb = most_common_bit(l, i)
-        l = list(filter(lambda n: n[i] == (str(mcb) if mcb > -1 else "1"), l))
-        if len(l) == 1:
-            return int(l[0], 2)
-
-
-def co2_scrubber_rating(numbers):
-    l = numbers
-    for i, _ in enumerate(numbers[0]):
-        mcb = most_common_bit(l, i)
-        l = list(filter(lambda n: n[i] != (str(mcb) if mcb > -1 else "1"), l))
-        if len(l) == 1:
-            return int(l[0], 2)
-
-
 def part2(numbers):
-    o = oxygen_rating(numbers)
-    co2 = co2_scrubber_rating(numbers)
+    o = process(numbers, filter_oxygen_rating)
+    co2 = process(numbers, filter_co2_scrubber_rating)
     return o * co2
 
 
