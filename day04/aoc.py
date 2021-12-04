@@ -28,16 +28,6 @@ class Board:
                 return True
         return False
 
-    def calculate_score(self, ns):
-        self.hits = [False] * 25
-        for i, x in enumerate(ns):
-            self.mark(x)
-
-            if self.is_bingo():
-                return i, self.unmarked_sum() * x
-
-        return 0, 0
-
     def unmarked_sum(
         self,
     ):
