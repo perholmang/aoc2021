@@ -17,22 +17,10 @@ class Board:
                 self.hits[i] = True
 
     def check_row(self, n: int) -> bool:
-        return (
-            self.hits[n * 5]
-            and self.hits[n * 5 + 1]
-            and self.hits[n * 5 + 2]
-            and self.hits[n * 5 + 3]
-            and self.hits[n * 5 + 4]
-        )
+        return all(self.hits[i] == True for i in range(n * 5, n * 5 + 5))
 
     def check_column(self, n: int) -> bool:
-        return (
-            self.hits[n]
-            and self.hits[n + 5]
-            and self.hits[n + 10]
-            and self.hits[n + 15]
-            and self.hits[n + 20]
-        )
+        return all(self.hits[i] == True for i in range(n, n + 25, 5))
 
     def is_bingo(self):
         for i in range(0, 5):
@@ -57,13 +45,6 @@ class Board:
         for i, x in enumerate(self.numbers):
             score += x if not self.hits[i] else 0
         return score
-
-    def __str__(self) -> str:
-        out = ""
-        for i, x in enumerate(self.numbers):
-            out += str(x) + ("* " if self.hits[i] else " ")
-        print(self.unmarked_sum())
-        return out
 
 
 def get_input(i):
