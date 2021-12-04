@@ -34,7 +34,7 @@ class Board:
             and self.hits[n + 20]
         )
 
-    def check_bingo(self):
+    def is_bingo(self):
         for i in range(0, 5):
             if self.check_row(i) or self.check_column(i):
                 return True
@@ -45,10 +45,10 @@ class Board:
         for i, x in enumerate(ns):
             self.mark(x)
 
-            if self.check_bingo():
+            if self.is_bingo():
                 return i, self.unmarked_sum() * x
 
-        return 0
+        return 0, 0
 
     def unmarked_sum(
         self,
@@ -57,6 +57,13 @@ class Board:
         for i, x in enumerate(self.numbers):
             score += x if not self.hits[i] else 0
         return score
+
+    def __str__(self) -> str:
+        out = ""
+        for i, x in enumerate(self.numbers):
+            out += str(x) + ("* " if self.hits[i] else " ")
+        print(self.unmarked_sum())
+        return out
 
 
 def get_input(i):
@@ -76,30 +83,24 @@ def get_input(i):
 
 def part1(i):
     numbers, boards = get_input(i)
-    min_n, max_score = 0, 0
-
-    for b in boards:
-        n, score = b.calculate_score(numbers)
-
-        if n < min_n or min_n == 0:
-            min_n = n
-            max_score = score
-
-    return max_score
+    for x in numbers:
+        for b in boards:
+            b.mark(x)
+            if b.is_bingo():
+                return b.unmarked_sum() * x
 
 
 def part2(i):
     numbers, boards = get_input(i)
-    max_n, max_score = 0, 0
 
-    for b in boards:
-        n, score = b.calculate_score(numbers)
-
-        if n > max_n:
-            max_n = n
-            max_score = score
-
-    return max_score
+    for x in numbers:
+        for b in reversed(boards):
+            b.mark(x)
+            if b.is_bingo():
+                if len(boards) == 1:
+                    return boards[0].unmarked_sum() * x
+                else:
+                    boards.remove(b)
 
 
 with open("input.txt") as f:
