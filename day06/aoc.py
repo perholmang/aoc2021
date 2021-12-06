@@ -8,17 +8,10 @@ def count_after_days(fish: List[int], days: int) -> int:
         m[f] += 1
 
     for _ in range(0, days):
-        n = m[0]
-
-        m[0] = m[1]
-        m[1] = m[2]
-        m[2] = m[3]
-        m[3] = m[4]
-        m[4] = m[5]
-        m[5] = m[6]
-        m[6] = m[7] + n
-        m[7] = m[8]
-        m[8] = n
+        spawn = m[0]
+        for i in range(0, 8):
+            m[i] = m[i + 1] + (spawn if i == 6 else 0)
+        m[8] = spawn
 
     return sum(m.values())
 
