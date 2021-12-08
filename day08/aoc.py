@@ -32,7 +32,7 @@ def combinations(word):
 
 def remove_candidates(mappings, candidates, ignore):
     new_mappings = {}
-    for i, (k, v) in enumerate(mappings.items()):
+    for _, (k, v) in enumerate(mappings.items()):
         new_mappings[k] = v if k in ignore else [i for i in v if i not in candidates]
 
     return new_mappings
@@ -67,12 +67,7 @@ def process(signals):
 
 
 def decode(s: str, mappings):
-    real = set()
-    for c in s:
-        real = set(mappings[c]) | real
-
-    out = "".join(sorted(list(real)))
-    return wirings.index(out)
+    return wirings.index("".join(sorted([mappings[c][0] for c in s])))
 
 
 def part1(rows):
