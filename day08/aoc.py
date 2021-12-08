@@ -1,6 +1,4 @@
 from os import environ
-from typing import List
-
 
 wires = ["a", "b", "c", "d", "e", "f", "g"]
 wirings = [
@@ -30,122 +28,70 @@ def combinations(word):
         return list(set(wirings[0]) | set(wirings[6]) | set(wirings[9]))
     elif len(word) == 7:
         return list(wirings[8])
-    else:
-        raise ValueError("invalid length")
 
 
-def remove_from(m, c, ignore):
-    m2 = {}
-    for i, (k, v) in enumerate(m.items()):
-        if k in ignore:
-            m2[k] = v
-        else:
-            m2[k] = [i for i in v if i not in c]
+def remove_candidates(mappings, candidates, ignore):
+    new_mappings = {}
+    for i, (k, v) in enumerate(mappings.items()):
+        new_mappings[k] = v if k in ignore else [i for i in v if i not in candidates]
 
-    return m2
+    return new_mappings
 
 
 def process(signals):
-    alts = {x: wires for x in wires}
+    mappings = {x: wires for x in wires}
     for s in signals:
         cmbs = combinations(s)
         for c in s:
-            alts[c] = list(set(alts[c]) & set(cmbs))
+            mappings[c] = list(set(mappings[c]) & set(cmbs))
 
         if len(s) in [2, 3, 4, 7]:
-            alts = remove_from(alts, cmbs, list(s))
+            mappings = remove_candidates(mappings, cmbs, list(s))
 
         if len(s) == 6:
             missing = [x for x in "abcdefg" if x not in s]
-            alts[missing[0]] = list(set(alts[missing[0]]) & set(["d", "c", "e"]))
+            mappings[missing[0]] = list(
+                set(mappings[missing[0]]) & set(["d", "c", "e"])
+            )
 
         if len(s) == 5:
             missing = [x for x in "abcdefg" if x not in s]
             for m in missing:
-                alts[m] = list(set(alts[m]) & set(["b", "e", "f", "c", "e"]))
+                mappings[m] = list(set(mappings[m]) & set(["b", "e", "f", "c", "e"]))
 
-        for i, (k, v) in enumerate(alts.items()):
+        for _, (k, v) in enumerate(mappings.items()):
             if len(v) == 1:
-                alts = remove_from(alts, v, [k])
+                mappings = remove_candidates(mappings, v, [k])
 
-    return alts
+    return mappings
 
 
-def decode(s: str, m):
+def decode(s: str, mappings):
     real = set()
     for c in s:
-        real = set(m[c]) | real
+        real = set(mappings[c]) | real
 
-    l = list(real)
-    l.sort()
-    out = "".join(l)
-
+    out = "".join(sorted(list(real)))
     return wirings.index(out)
 
 
-def deduce(pattern: str) -> int:
-    if len(pattern) == 2:
-        return 1
-    elif len(pattern) == 3:
-        return 7
-    elif len(pattern) == 4:
-        return 4
-    elif len(pattern) == 7:
-        return 8
-
-    return None
-
-
-def build_map(rows):
-    count = {k: 0 for k in range(0, 9)}
-    for r in rows:
-        i, o = [p.split(" ") for p in r]
-        for p in o:
-            n = deduce(p)
-            if n:
-                count[n] += 1
-
-    return count
-
-
 def part1(rows):
-    count = {k: 0 for k in range(0, 9)}
+    sum = 0
     for r in rows:
-        i, o = [p.split(" ") for p in r]
-        for p in o:
-            n = deduce(p)
-            if n:
-                count[n] += 1
+        signals, output = [p.split(" ") for p in r]
+        mappings = process(signals + output)
+        output_value = [decode(n, mappings) for n in output]
+        sum += len([i for i in output_value if i in [1, 4, 7, 8]])
 
-    return count[1] + count[4] + count[7] + count[8]
-
-
-def sort_func(x):
-    if len(x) == 2:
-        return 0
-    elif len(x) == 3:
-        return 1
-    elif len(x) == 7:
-        return 2
-    return len(x)
+    return sum
 
 
 def part2(rows):
     sum = 0
     for r in rows:
-        i, o = [p.split(" ") for p in r]
-
-        words = i + o
-        words.sort(key=sort_func)
-
-        alts = process(words)
-
-        output = ""
-
-        for n in o:
-            n = decode(n, alts)
-            output += str(n)
-        sum += int(output)
+        signals, output = [p.split(" ") for p in r]
+        mappings = process(signals + output)
+        sum += int("".join([str(decode(n, mappings)) for n in output]))
 
     return sum
 
