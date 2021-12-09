@@ -1,6 +1,6 @@
 from os import environ
 from math import floor
-import numpy as np
+import functools
 
 
 def get_adjacent(i, arr, size):
@@ -20,26 +20,28 @@ def get_adjacent(i, arr, size):
 
 
 def low_points(map, size):
-    list = []
+    lp = []
     for i, p in enumerate(map):
         n = get_adjacent(i, map, size)
         if all(x > p for (ia, x) in n):
-            list.append((i, p))
+            lp.append((i, p))
 
-    return list
+    return lp
 
 
 def get_basins(l, arr, size):
     q = [l]
     basins = []
+    visited = []
     while q:
         (i, n) = q.pop()
         basins.append(i)
         adj = get_adjacent(i, arr, size)
-        for (a, an) in adj:
-            if an < 9 and an > n:
+        for (a, an) in [(a, an) for (a, an) in adj if an < 9 and an > n]:
+            if a not in visited:
                 basins.append(a)
                 q.append((a, an))
+                visited.append(a)
 
     return list(set(basins))
 
@@ -60,8 +62,7 @@ def part2(rows):
         basins = get_basins(p, points, size)
         basin_sizes.append(len(basins))
 
-    s = np.prod(sorted(basin_sizes, reverse=True)[0:3])
-    return s
+    return functools.reduce(lambda a, b: a * b, sorted(basin_sizes, reverse=True)[0:3])
 
 
 with open("input.txt") as f:
