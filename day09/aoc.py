@@ -29,8 +29,8 @@ def low_points(heightmap, size):
     return lp
 
 
-def get_basins(l, arr, size):
-    stack = [l]
+def get_basins(point, arr, size):
+    stack = [point]
     basins = []
     visited = []
     while stack:
@@ -57,10 +57,7 @@ def part2(rows):
     size = len(rows[0])
     points = [int(x) for row in rows for x in row]
     low = low_points(points, size)
-    basin_sizes = []
-
-    for p in low:
-        basin_sizes.append(len(get_basins(p, points, size)))
+    basin_sizes = [len(get_basins(p, points, size)) for p in low]
 
     return functools.reduce(lambda a, b: a * b, sorted(basin_sizes, reverse=True)[0:3])
 
