@@ -3,45 +3,45 @@ from math import floor
 import functools
 
 
-def get_adjacent(i, arr, size):
-    l = []
-    row = floor(i / size)
-    if i > 0 and i % size != 0:
-        l.append((i - 1, arr[i - 1]))
-    if i % size != size - 1:
-        l.append((i + 1, arr[i + 1]))
-    if i >= size:
-        idx = (row - 1) * size + i % size
-        l.append((idx, arr[idx]))
+def get_adjacent(idx, arr, size):
+    adjacent = []
+    row = floor(idx / size)
+    if idx > 0 and idx % size != 0:
+        adjacent.append((idx - 1, arr[idx - 1]))
+    if idx % size != size - 1:
+        adjacent.append((idx + 1, arr[idx + 1]))
+    if idx >= size:
+        idx = (row - 1) * size + idx % size
+        adjacent.append((idx, arr[idx]))
     if row < (len(arr) / size) - 1:
-        idx = (row + 1) * size + i % size
-        l.append((idx, arr[idx]))
-    return l
+        idx = (row + 1) * size + idx % size
+        adjacent.append((idx, arr[idx]))
+    return adjacent
 
 
-def low_points(map, size):
+def low_points(heightmap, size):
     lp = []
-    for i, p in enumerate(map):
-        n = get_adjacent(i, map, size)
-        if all(x > p for (ia, x) in n):
-            lp.append((i, p))
+    for idx, height in enumerate(heightmap):
+        n = get_adjacent(idx, heightmap, size)
+        if all(x > height for (_, x) in n):
+            lp.append((idx, height))
 
     return lp
 
 
 def get_basins(l, arr, size):
-    q = [l]
+    stack = [l]
     basins = []
     visited = []
-    while q:
-        (i, n) = q.pop()
-        basins.append(i)
-        adj = get_adjacent(i, arr, size)
-        for (a, an) in [(a, an) for (a, an) in adj if an < 9 and an > n]:
-            if a not in visited:
-                basins.append(a)
-                q.append((a, an))
-                visited.append(a)
+    while stack:
+        (idx, height) = stack.pop()
+        basins.append(idx)
+        adj = get_adjacent(idx, arr, size)
+        for (ai, ah) in [(ai, ah) for (ai, ah) in adj if ah < 9 and ah > height]:
+            if ai not in visited:
+                basins.append(ai)
+                stack.append((ai, ah))
+                visited.append(ai)
 
     return list(set(basins))
 
@@ -58,9 +58,9 @@ def part2(rows):
     points = [int(x) for row in rows for x in row]
     low = low_points(points, size)
     basin_sizes = []
+
     for p in low:
-        basins = get_basins(p, points, size)
-        basin_sizes.append(len(basins))
+        basin_sizes.append(len(get_basins(p, points, size)))
 
     return functools.reduce(lambda a, b: a * b, sorted(basin_sizes, reverse=True)[0:3])
 
