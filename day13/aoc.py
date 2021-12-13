@@ -1,41 +1,29 @@
 from os import environ
 from math import floor
 import re
+import time
 
 
-def print_dots(matrix, col_size):
+def dots_to_string(dots, rows, cols):
     out = ""
-    for i, d in enumerate(matrix):
-        out += "." if not d else "#"
-        if i % col_size == col_size - 1:
-            out += "\n"
-    print(out)
+    for y in range(0, rows):
+        for x in range(0, cols):
+            out += "#" if (x, y) in dots else "."
+        out += "\n"
+    return out
 
 
-def idx(col_size, x, y):
-    return (y * col_size) + x
+def fold(dots, axis, pos):
+    new_dots = set()
 
-
-def xy(col_size, idx):
-    y = int(floor(idx / col_size))
-    x = idx % col_size
-    return x, y
-
-
-def fold(paper, col_size, axis, pos):
-    out_rows = int(len(paper) / col_size) if axis == "x" else pos
-    out_cols = col_size if axis == "y" else pos
-    out = [False] * out_rows * out_cols
-
-    for i, dot in enumerate(paper):
-        x, y = xy(col_size, i)
+    for (x, y) in dots:
         map_y = pos - (y - pos) if axis == "y" and y > pos else y
         map_x = pos - (x - pos) if axis == "x" and x > pos else x
 
         if (axis == "y" and y != pos) or (axis == "x" and x != pos):
-            out[idx(out_cols, map_x, map_y)] = dot or out[idx(out_cols, map_x, map_y)]
+            new_dots.add((map_x, map_y))
 
-    return out
+    return new_dots
 
 
 def build_paper(lines):
@@ -52,28 +40,25 @@ def build_paper(lines):
             match = re.match("fold along (x|y)=(\\d+)", line)
             fold_instructions.append((match[1], int(match[2])))
 
-    paper = [False] * (rows) * (cols)
-    for (x, y) in dots:
-        paper[idx(cols, x, y)] = True
-
-    return paper, fold_instructions, cols
+    return dots, fold_instructions, rows, cols
 
 
 def part1(lines):
-    paper, fold_instructions, cols = build_paper(lines)
-    folded = fold(paper, cols, fold_instructions[0][0], fold_instructions[0][1])
+    dots, fold_instructions, rows, cols = build_paper(lines)
+    folded = fold(dots, fold_instructions[0][0], fold_instructions[0][1])
     return len([d for d in folded if d])
 
 
 def part2(lines):
-    paper, fold_instructions, cols = build_paper(lines)
-    col_size = cols
+    dots, fold_instructions, rows, cols = build_paper(lines)
     for instruction in fold_instructions:
-        paper = fold(paper, col_size, instruction[0], instruction[1])
+        dots = fold(dots, instruction[0], instruction[1])
         if instruction[0] == "x":
-            col_size = instruction[1]
+            cols = instruction[1]
+        else:
+            rows = instruction[1]
 
-    print_dots(paper, col_size)
+    print(dots_to_string(dots, rows, cols))
 
 
 with open("input.txt") as f:
