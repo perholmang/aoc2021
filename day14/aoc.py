@@ -2,31 +2,25 @@ from os import environ
 
 
 def process_step(pairs_count, pairs):
-    new_count = {}
-    for _, (k, v) in enumerate(pairs_count.items()):
-        new_count[k] = v
+    new_count = {k: v for (k, v) in pairs_count.items()}
 
     for pair in pairs.keys():
         count = pairs_count[pair]
         insert_char = pairs[pair]
         n1 = pair[0] + insert_char
         n2 = insert_char + pair[1]
-        new_count[n1] = new_count[n1] + count
-        new_count[n2] = new_count[n2] + count
         new_count[pair] -= count
+        new_count[n1] += count
+        new_count[n2] += count
 
     return new_count
 
 
 def process(template, pairs, n):
-    pairs_count = {}
-
-    for pair in pairs.keys():
-        pairs_count[pair] = 0
+    pairs_count = {pair: 0 for pair in pairs.keys()}
 
     for i in range(0, len(template) - 1):
-        pair = template[i] + template[i + 1]
-        pairs_count[pair] = 1
+        pairs_count[template[i] + template[i + 1]] = 1
 
     for i in range(0, n):
         pairs_count = process_step(pairs_count, pairs)
