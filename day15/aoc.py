@@ -1,6 +1,8 @@
-from os import environ
-import numpy as np
 from math import floor
+from os import environ
+from queue import PriorityQueue
+
+import numpy as np
 
 
 def safest_path_alt(cave):
@@ -9,26 +11,24 @@ def safest_path_alt(cave):
     dx = [-1, 0, 1, 0]
     dy = [0, 1, 0, -1]
 
-    stack = set()
-    stack.add((0, 0, 0))
+    stack = PriorityQueue()
+    stack.put((0, 0, 0))
 
     cost[0][0] = 0
 
-    while stack:
-        next = stack.pop()
+    while not stack.empty():
+        next = stack.get()
+
         for i in range(0, 4):
-            x = next[0] + dx[i]
-            y = next[1] + dy[i]
+            x = next[1] + dx[i]
+            y = next[2] + dy[i]
 
             if x < 0 or x >= len(cave[0]) or y < 0 or y >= len(cave):
                 continue
 
-            if cost[x][y] > cost[next[0]][next[1]] + cave[x][y]:
-                if cost[x][y] != np.Inf:
-                    if (x, y, cost[x][y]) in stack:
-                        stack.remove((x, y, cost[x][y]))
-                cost[x][y] = cost[next[0]][next[1]] + cave[x][y]
-                stack.add((x, y, cost[x][y]))
+            if cost[x][y] > cost[next[1]][next[2]] + cave[x][y]:
+                cost[x][y] = cost[next[1]][next[2]] + cave[x][y]
+                stack.put((cost[x][y], x, y))
 
     return cost[-1][-1]
 
