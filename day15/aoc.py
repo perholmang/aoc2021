@@ -15,18 +15,18 @@ def safest_path_alt(cave):
     cost[0][0] = 0
 
     while not queue.empty():
-        next = queue.get()
+        (_, x, y) = queue.get()
 
         for i in range(0, 4):
-            x = next[1] + dx[i]
-            y = next[2] + dy[i]
+            nx = x + dx[i]
+            ny = y + dy[i]
 
-            if x < 0 or x >= len(cave[0]) or y < 0 or y >= len(cave):
+            if nx < 0 or nx >= len(cave[0]) or ny < 0 or ny >= len(cave):
                 continue
 
-            if cost[x][y] > cost[next[1]][next[2]] + cave[x][y]:
-                cost[x][y] = cost[next[1]][next[2]] + cave[x][y]
-                queue.put((cost[x][y], x, y))
+            if cost[nx][ny] > cost[x][y] + cave[nx][ny]:
+                cost[nx][ny] = cost[x][y] + cave[nx][ny]
+                queue.put((cost[nx][ny], nx, ny))
 
     return cost[-1][-1]
 
