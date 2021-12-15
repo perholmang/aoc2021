@@ -9,13 +9,13 @@ def safest_path_alt(cave):
     dx = [-1, 0, 1, 0]
     dy = [0, 1, 0, -1]
 
-    stack = PriorityQueue()
-    stack.put((0, 0, 0))
+    queue = PriorityQueue()
+    queue.put((0, 0, 0))
 
     cost[0][0] = 0
 
-    while not stack.empty():
-        next = stack.get()
+    while not queue.empty():
+        next = queue.get()
 
         for i in range(0, 4):
             x = next[1] + dx[i]
@@ -26,14 +26,9 @@ def safest_path_alt(cave):
 
             if cost[x][y] > cost[next[1]][next[2]] + cave[x][y]:
                 cost[x][y] = cost[next[1]][next[2]] + cave[x][y]
-                stack.put((cost[x][y], x, y))
+                queue.put((cost[x][y], x, y))
 
     return cost[-1][-1]
-
-
-def part1(lines):
-    cave = [[int(c) for c in line] for line in lines]
-    return safest_path_alt(cave)
 
 
 def expand_cave(cave):
@@ -47,6 +42,11 @@ def expand_cave(cave):
             real_row.append((orig + to_add) % 9 if orig + to_add > 9 else orig + to_add)
         real_cave.append(real_row)
     return real_cave
+
+
+def part1(lines):
+    cave = [[int(c) for c in line] for line in lines]
+    return safest_path_alt(cave)
 
 
 def part2(lines):
