@@ -3,7 +3,7 @@ from os import environ
 from queue import PriorityQueue
 
 
-def safest_path_alt(cave):
+def safest_path_dijkstra(cave):
     cost = [[float("inf")] * len(cave[0]) for i in range(len(cave))]
 
     dx = [-1, 0, 1, 0]
@@ -24,8 +24,10 @@ def safest_path_alt(cave):
             if nx < 0 or nx >= len(cave[0]) or ny < 0 or ny >= len(cave):
                 continue
 
-            if cost[nx][ny] > cost[x][y] + cave[nx][ny]:
-                cost[nx][ny] = cost[x][y] + cave[nx][ny]
+            entry_cost = cost[x][y] + cave[nx][ny]
+
+            if entry_cost < cost[nx][ny]:
+                cost[nx][ny] = entry_cost
                 queue.put((cost[nx][ny], nx, ny))
 
     return cost[-1][-1]
@@ -46,14 +48,14 @@ def expand_cave(cave):
 
 def part1(lines):
     cave = [[int(c) for c in line] for line in lines]
-    return safest_path_alt(cave)
+    return safest_path_dijkstra(cave)
 
 
 def part2(lines):
     cave = [[int(c) for c in line] for line in lines]
     real_cave = expand_cave(cave)
 
-    return safest_path_alt(real_cave)
+    return safest_path_dijkstra(real_cave)
 
 
 with open("input.txt") as f:
