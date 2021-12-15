@@ -2,11 +2,9 @@ from math import floor
 from os import environ
 from queue import PriorityQueue
 
-import numpy as np
-
 
 def safest_path_alt(cave):
-    cost = [[np.Inf] * len(cave[0]) for i in range(len(cave))]
+    cost = [[float("inf")] * len(cave[0]) for i in range(len(cave))]
 
     dx = [-1, 0, 1, 0]
     dy = [0, 1, 0, -1]
