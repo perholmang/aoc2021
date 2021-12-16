@@ -48,7 +48,7 @@ class Packet:
             return 1 if sub_values[0] == sub_values[1] else 0
 
 
-def hextobinstr(hexstr):
+def hex_to_binstr(hexstr):
     return "".join([format(int(ch, 16), "0>4b") for ch in hexstr])
 
 
@@ -112,7 +112,7 @@ def version_sum(packet):
 
 
 def part1(hexstr):
-    binstr = hextobinstr(hexstr)
+    binstr = hex_to_binstr(hexstr)
     packet = parse_packet(
         binstr,
     )
@@ -120,7 +120,7 @@ def part1(hexstr):
 
 
 def part2(hexstr):
-    binstr = hextobinstr(hexstr)
+    binstr = hex_to_binstr(hexstr)
     packet = parse_packet(
         binstr,
     )
