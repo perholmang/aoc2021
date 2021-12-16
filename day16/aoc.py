@@ -74,20 +74,20 @@ def parse_packet(binstr):
         idx += 1
 
         if length_type_id == "0":
-            bit_length = int(binstr[idx : idx + 15], 2)
+            packets_length = int(binstr[idx : idx + 15], 2)
             idx += 15
 
             curr = 0
-            while curr < bit_length:
+            while curr < packets_length:
                 sub = parse_packet(binstr[idx:])
                 idx += sub.length
                 curr += sub.length
                 packet.subpackets.append(sub)
 
         elif length_type_id == "1":
-            no_packets = int(binstr[idx : idx + 11], 2)
+            no_of_packets = int(binstr[idx : idx + 11], 2)
             idx += 11
-            for _ in range(0, no_packets):
+            for _ in range(0, no_of_packets):
                 sub = parse_packet(binstr[idx:])
                 idx += sub.length
                 packet.subpackets.append(sub)
