@@ -1,4 +1,3 @@
-import re
 from os import environ
 from functools import reduce
 import operator
