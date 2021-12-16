@@ -3,6 +3,15 @@ from os import environ
 from functools import reduce
 import operator
 
+TYPE_SUM = 0
+TYPE_PRODUCT = 1
+TYPE_MIN = 2
+TYPE_MAX = 3
+TYPE_LITERAL_VALUE = 4
+TYPE_GT = 5
+TYPE_LT = 6
+TYPE_EQ = 7
+
 
 class Packet:
     value = None
@@ -17,26 +26,26 @@ class Packet:
         self.subpackets = []
 
     def is_literal(self):
-        return self.type == "4"
+        return self.type == TYPE_LITERAL_VALUE
 
     def get_value(self):
         sub_values = [p.get_value() for p in self.subpackets]
 
-        if self.type == 0:
+        if self.type == TYPE_SUM:
             return sum(sub_values)
-        elif self.type == 1:
+        elif self.type == TYPE_PRODUCT:
             return reduce(operator.mul, sub_values, 1)
-        elif self.type == 2:
+        elif self.type == TYPE_MIN:
             return min(sub_values)
-        elif self.type == 3:
+        elif self.type == TYPE_MAX:
             return max(sub_values)
-        elif self.type == 4:
+        elif self.type == TYPE_LITERAL_VALUE:
             return self.value
-        elif self.type == 5:
+        elif self.type == TYPE_GT:
             return 1 if sub_values[0] > sub_values[1] else 0
-        elif self.type == 6:
+        elif self.type == TYPE_LT:
             return 1 if sub_values[0] < sub_values[1] else 0
-        elif self.type == 7:
+        elif self.type == TYPE_EQ:
             return 1 if sub_values[0] == sub_values[1] else 0
 
 
@@ -51,7 +60,7 @@ def parse_packet(binstr):
 
     packet = Packet(version, type)
 
-    if type == 4:
+    if type == TYPE_LITERAL_VALUE:
         seen_last_group = False
         total = ""
         while not seen_last_group:
@@ -91,16 +100,16 @@ def parse_packet(binstr):
 
 def version_sum(packet):
     stack = [packet]
-    sum = 0
+    total = 0
 
     while stack:
         next = stack.pop()
-        sum += next.version
+        total += next.version
         if not next.is_literal():
             for sub in next.subpackets:
                 stack.append(sub)
 
-    return sum
+    return total
 
 
 def part1(hexstr):
