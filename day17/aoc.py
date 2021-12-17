@@ -1,41 +1,27 @@
-from os import environ
 import re
+from os import environ
 
 
-class Probe:
-    def __init__(self, x, y, vx, vy) -> None:
-        self.x = x
-        self.y = y
-        self.vx = vx
-        self.vy = vy
-        self.max_y = 0
-
-    def reset(self):
-        self.x = 0
-        self.y = 0
-
-    def update(self):
-        self.x += self.vx
-        self.y += self.vy
-
-        dvx = -1 if self.vx > 0 else 1 if self.vx > 0 else 0
-        self.vx += dvx
-        self.vy -= 1
-
-        self.max_y = max(self.max_y, self.y)
-
-    def within(self, x1, y1, x2, y2):
-        return self.x >= x1 and self.x <= x2 and self.y >= y1 and self.y <= y2
+def tick(x, y, vx, vy):
+    dvx = -1 if vx > 0 else 1 if vx > 0 else 0
+    return (x + vx, y + vy, vx + dvx, vy - 1)
 
 
-def will_hit_target(probe, tx1, ty1, tx2, ty2):
+def within(x, y, tx1, ty1, tx2, ty2):
+    return x >= tx1 and x <= tx2 and y >= ty1 and y <= ty2
+
+
+def will_it_hit(vx, vy, tx1, ty1, tx2, ty2):
+    highest_y = 0
+    x, y = 0, 0
     while True:
-        probe.update()
-        if probe.within(tx1, ty1, tx2, ty2):
-            return True
+        (x, y, vx, vy) = tick(x, y, vx, vy)
+        highest_y = max(highest_y, y)
+        if within(x, y, tx1, ty1, tx2, ty2):
+            return (True, highest_y)
 
-        if probe.x > tx2 or (probe.y < ty1):
-            return False
+        if x > tx2 or (y < ty1):
+            return (False, 0)
 
 
 def simulate(tx1, ty1, tx2, ty2):
@@ -44,15 +30,9 @@ def simulate(tx1, ty1, tx2, ty2):
 
     for vx in range(0, tx2 + 1):
         for vy in range(ty1 - 1, abs(ty1) + 1):
-            p = Probe(0, 0, vx, vy)
-            if will_hit_target(
-                p,
-                tx1,
-                ty1,
-                tx2,
-                ty2,
-            ):
-                highest_y = max(highest_y, p.max_y)
+            (hit, max_y) = will_it_hit(vx, vy, tx1, ty1, tx2, ty2)
+            if hit:
+                highest_y = max(highest_y, max_y)
                 successful += 1
 
     return (successful, highest_y)
