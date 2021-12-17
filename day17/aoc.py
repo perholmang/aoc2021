@@ -20,7 +20,7 @@ def will_it_hit(vx, vy, tx1, ty1, tx2, ty2):
         if within(x, y, tx1, ty1, tx2, ty2):
             return (True, highest_y)
 
-        if x > tx2 or (y < ty1):
+        if x > tx2 or (y < ty1) or (x < tx1 and vx < 1):
             return (False, 0)
 
 
@@ -41,13 +41,13 @@ def simulate(tx1, ty1, tx2, ty2):
 def part1(lines):
     m = re.match("target area: x=(\\d+)..(\\d+), y=(-\\d+)..(-\\d+)", lines[0])
     x1, x2, y1, y2 = [int(m.group(x)) for x in range(1, 5)]
-    return simulate(x1, y1, x2, y2)[0]
+    return simulate(x1, y1, x2, y2)[1]
 
 
 def part2(lines):
     m = re.match("target area: x=(\\d+)..(\\d+), y=(-\\d+)..(-\\d+)", lines[0])
     x1, x2, y1, y2 = [int(m.group(x)) for x in range(1, 5)]
-    return simulate(x1, y1, x2, y2)[1]
+    return simulate(x1, y1, x2, y2)[0]
 
 
 with open("input.txt") as f:
