@@ -14,7 +14,7 @@ class Probe:
         self.x = 0
         self.y = 0
 
-    def update(self, debug=False):
+    def update(self):
         self.x += self.vx
         self.y += self.vy
 
@@ -28,30 +28,29 @@ class Probe:
         return self.x >= x1 and self.x <= x2 and self.y >= y1 and self.y <= y2
 
 
-def will_hit_target(probe, x1, y1, x2, y2, debug=False):
+def will_hit_target(probe, tx1, ty1, tx2, ty2):
     while True:
-        probe.update(debug=debug)
-        if probe.within(x1, y1, x2, y2):
+        probe.update()
+        if probe.within(tx1, ty1, tx2, ty2):
             return True
 
-        if probe.x > x2 or (probe.y < y1):
+        if probe.x > tx2 or (probe.y < ty1):
             return False
 
 
-def simulate(x1, y1, x2, y2):
+def simulate(tx1, ty1, tx2, ty2):
     highest_y = 0
     successful = 0
 
-    for vx in range(0, x2 + 1):
-        for vy in range(y1 - 1, abs(y1) + 1):
+    for vx in range(0, tx2 + 1):
+        for vy in range(ty1 - 1, abs(ty1) + 1):
             p = Probe(0, 0, vx, vy)
             if will_hit_target(
                 p,
-                x1,
-                y1,
-                x2,
-                y2,
-                debug=True if vx == 6 and vy == 0 else False,
+                tx1,
+                ty1,
+                tx2,
+                ty2,
             ):
                 highest_y = max(highest_y, p.max_y)
                 successful += 1
